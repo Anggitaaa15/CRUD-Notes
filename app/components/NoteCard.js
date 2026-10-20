@@ -6,18 +6,23 @@ import Link from "next/link";
 export default function NoteCard({ note, onDelete }) {
   return (
     <article className="note-card">
-      <div className="note-card-top">
-        <span className="note-symbol">▤</span>
-        <span className="collection-tag">
-          {note.collection_name || "Tanpa koleksi"}
-        </span>
-      </div>
+      <Link
+        href={`/notes/${note.id}`}
+        className="note-detail-link"
+      >
+        <div className="note-card-top">
+          <span className="note-symbol">▤</span>
+          <span className="collection-tag">
+            {note.collection_name || "Tanpa koleksi"}
+          </span>
+        </div>
 
-      <h3>{note.title}</h3>
+        <h3>{note.title}</h3>
 
-      <p className="note-content">
-        {note.content || "Tidak ada isi catatan."}
-      </p>
+        <p className="note-content">
+          {note.content || "Tidak ada isi catatan."}
+        </p>
+      </Link>
 
       <div className="note-card-footer">
         <span>
