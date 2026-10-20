@@ -1,69 +1,216 @@
-import Image from "next/image";
+
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
+  const [notes, setNotes] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  async function loadDashboard() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const [notesResponse, collectionsResponse] = await Promise.all([
+        fetch("/api/notes"),
+        fetch("/api/collections"),
+      ]);
+
+      const notesData = await notesResponse.json();
+      const collectionsData = await collectionsResponse.json();
+
+      if (!notesResponse.ok) {
+        throw new Error(notesData.error || "Gagal mengambil catatan");
+      }
+
+      if (!collectionsResponse.ok) {
+        throw new Error(
+          collectionsData.error || "Gagal mengambil koleksi"
+        );
+      }
+
+      setNotes(notesData);
+      setCollections(collectionsData);
+    } catch (error) {
+      setError(error.message || "Terjadi kesalahan");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const filteredNotes = notes.filter((note) =>
+    `${note.title} ${note.content || ""} ${
+      note.collection_name || ""
+    }`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  const withoutCollection = notes.filter(
+    (note) => note.collection_id == null
+  ).length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="dashboard-page">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">WORKSPACE</p>
+          <h1>Hi, welcome back!</h1>
+          <p className="muted">Kelola ide dan catatanmu di satu tempat.</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="topbar-search">
+          <span>⌕</span>
+          <input
+            type="search"
+            placeholder="Cari catatan..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
         </div>
-      </main>
+      </header>
+
+      {error && <p className="error-message">{error}</p>}
+
+      <section className="stats-grid">
+        <article className="stat-card stat-purple">
+          <div className="stat-top">
+            <span>Total Catatan</span>
+            <span className="stat-icon">▤</span>
+          </div>
+          <strong>{loading ? "..." : notes.length}</strong>
+          <p>Catatan tersimpan</p>
+        </article>
+
+        <article className="stat-card stat-pink">
+          <div className="stat-top">
+            <span>Total Koleksi</span>
+            <span className="stat-icon">▣</span>
+          </div>
+          <strong>{loading ? "..." : collections.length}</strong>
+          <p>Koleksi catatanmu</p>
+        </article>
+
+        <article className="stat-card stat-yellow">
+          <div className="stat-top">
+            <span>Tanpa Koleksi</span>
+            <span className="stat-icon">◇</span>
+          </div>
+          <strong>{loading ? "..." : withoutCollection}</strong>
+          <p>Catatan belum dikelompokkan</p>
+        </article>
+
+        <article className="stat-card stat-blue">
+          <div className="stat-top">
+            <span>Catatan Terbaru</span>
+            <span className="stat-icon">◷</span>
+          </div>
+          <strong>{loading ? "..." : notes.length ? "Ada" : "0"}</strong>
+          <p>Aktivitas catatanmu</p>
+        </article>
+      </section>
+
+      <section className="content-panel">
+        <div className="section-heading">
+          <div>
+            <h2>Catatan Saya</h2>
+            <p className="muted">Semua catatan yang kamu simpan.</p>
+          </div>
+
+          <Link href="/#tambah-catatan" className="primary-button">
+            + Tambah Catatan
+          </Link>
+        </div>
+
+        {loading && <p className="muted">Memuat catatan...</p>}
+
+        {!loading && !error && filteredNotes.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">▤</div>
+            <h3>{search ? "Catatan tidak ditemukan" : "Belum ada catatan"}</h3>
+            <p className="muted">
+              {search
+                ? "Coba kata kunci yang berbeda."
+                : "Tambahkan catatan pertamamu untuk mulai mengisi dashboard."}
+            </p>
+          </div>
+        )}
+
+        <div className="notes-grid">
+          {filteredNotes.map((note) => (
+            <article className="note-card" key={note.id}>
+              <div className="note-card-top">
+                <span className="note-symbol">▤</span>
+                <span className="collection-tag">
+                  {note.collection_name || "Tanpa koleksi"}
+                </span>
+              </div>
+
+              <h3>{note.title}</h3>
+
+              <p className="note-content">
+                {note.content || "Tidak ada isi catatan."}
+              </p>
+
+              <div className="note-card-footer">
+                <span>
+                  {note.created_at
+                    ? new Date(note.created_at).toLocaleDateString("id-ID")
+                    : "Tanggal tidak tersedia"}
+                </span>
+                <span>ID #{note.id}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="content-panel collection-panel">
+        <div className="section-heading">
+          <div>
+            <h2>Koleksi</h2>
+            <p className="muted">Kelompokkan catatan berdasarkan kategori.</p>
+          </div>
+
+          <Link href="/collections" className="text-link">
+            Kelola koleksi →
+          </Link>
+        </div>
+
+        {collections.length === 0 && !loading && (
+          <p className="muted">Belum ada koleksi.</p>
+        )}
+
+        <div className="collection-list">
+          {collections.slice(0, 5).map((collection, index) => {
+            const count = notes.filter(
+              (note) => Number(note.collection_id) === Number(collection.id)
+            ).length;
+
+            return (
+              <article className="collection-item" key={collection.id}>
+                <span className={`collection-icon collection-color-${index % 4}`}>
+                  ▣
+                </span>
+                <div className="collection-info">
+                  <strong>{collection.name}</strong>
+                  <span>{count} catatan</span>
+                </div>
+                <span className="collection-arrow">→</span>
+              </article>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
