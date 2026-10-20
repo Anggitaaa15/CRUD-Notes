@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menus = [
-  { label: "Dashboard", href: "/", icon: "▦" },
+  { label: "Home", href: "/", icon: "▦" },
   { label: "Semua Catatan", href: "/notes", icon: "▤" },
   { label: "Koleksi", href: "/collections", icon: "▣" },
 ];
