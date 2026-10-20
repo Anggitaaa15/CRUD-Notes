@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -27,8 +26,10 @@ export default function Sidebar() {
           const active =
             menu.href === "/"
               ? pathname === "/"
-              : pathname === menu.href ||
-                pathname.startsWith(menu.href + "/");
+              : menu.href === "/notes"
+                ? pathname === "/notes"
+                : pathname === menu.href ||
+                  pathname.startsWith(menu.href + "/");
 
           return (
             <Link

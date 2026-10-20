@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import NoteCard from "./components/NoteCard";
 
 export default function Home() {
   const [notes, setNotes] = useState([]);
@@ -9,7 +10,6 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
 
   async function loadDashboard() {
     try {
@@ -29,9 +29,7 @@ export default function Home() {
       }
 
       if (!collectionsResponse.ok) {
-        throw new Error(
-          collectionsData.error || "Gagal mengambil koleksi"
-        );
+        throw new Error(collectionsData.error || "Gagal mengambil koleksi");
       }
 
       setNotes(notesData);
@@ -43,20 +41,42 @@ export default function Home() {
     }
   }
 
+  async function handleDelete(id) {
+    const confirmed = window.confirm(
+      "Apakah kamu yakin ingin menghapus catatan ini?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/notes/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Gagal menghapus catatan");
+      }
+
+      await loadDashboard();
+    } catch (error) {
+      alert(error.message || "Gagal menghapus catatan");
+    }
+  }
+
   useEffect(() => {
     loadDashboard();
   }, []);
 
   const filteredNotes = notes.filter((note) =>
-    `${note.title} ${note.content || ""} ${
-      note.collection_name || ""
-    }`
+    `${note.title} ${note.content || ""} ${note.collection_name || ""}`
       .toLowerCase()
-      .includes(search.toLowerCase())
+      .includes(search.toLowerCase()),
   );
 
   const withoutCollection = notes.filter(
-    (note) => note.collection_id == null
+    (note) => note.collection_id == null,
   ).length;
 
   return (
@@ -126,7 +146,7 @@ export default function Home() {
             <p className="muted">Semua catatan yang kamu simpan.</p>
           </div>
 
-          <Link href="/#tambah-catatan" className="primary-button">
+          <Link href="/notes/new" className="primary-button">
             + Tambah Catatan
           </Link>
         </div>
@@ -147,29 +167,7 @@ export default function Home() {
 
         <div className="notes-grid">
           {filteredNotes.map((note) => (
-            <article className="note-card" key={note.id}>
-              <div className="note-card-top">
-                <span className="note-symbol">▤</span>
-                <span className="collection-tag">
-                  {note.collection_name || "Tanpa koleksi"}
-                </span>
-              </div>
-
-              <h3>{note.title}</h3>
-
-              <p className="note-content">
-                {note.content || "Tidak ada isi catatan."}
-              </p>
-
-              <div className="note-card-footer">
-                <span>
-                  {note.created_at
-                    ? new Date(note.created_at).toLocaleDateString("id-ID")
-                    : "Tanggal tidak tersedia"}
-                </span>
-                <span>ID #{note.id}</span>
-              </div>
-            </article>
+            <NoteCard key={note.id} note={note} onDelete={handleDelete} />
           ))}
         </div>
       </section>
@@ -193,18 +191,22 @@ export default function Home() {
         <div className="collection-list">
           {collections.slice(0, 5).map((collection, index) => {
             const count = notes.filter(
-              (note) => Number(note.collection_id) === Number(collection.id)
+              (note) => Number(note.collection_id) === Number(collection.id),
             ).length;
 
             return (
               <article className="collection-item" key={collection.id}>
-                <span className={`collection-icon collection-color-${index % 4}`}>
+                <span
+                  className={`collection-icon collection-color-${index % 4}`}
+                >
                   ▣
                 </span>
+
                 <div className="collection-info">
                   <strong>{collection.name}</strong>
                   <span>{count} catatan</span>
                 </div>
+
                 <span className="collection-arrow">→</span>
               </article>
             );

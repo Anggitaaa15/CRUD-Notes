@@ -29,9 +29,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =========================
-   DASHBOARD LAYOUT
-========================= */
+/* DASHBOARD LAYOUT */
 
 .dashboard-layout {
   display: flex;
@@ -133,9 +131,7 @@ body {
   padding: 32px;
 }
 
-/* =========================
-   DASHBOARD HEADER
-========================= */
+/* DASHBOARD HEADER */
 
 .dashboard-page {
   width: 100%;
@@ -202,9 +198,7 @@ body {
   font-size: 13px;
 }
 
-/* =========================
-   STATISTICS CARDS
-========================= */
+/* STATISTICS CARDS */
 
 .stats-grid {
   display: grid;
@@ -272,9 +266,7 @@ body {
   font-size: 11px;
 }
 
-/* =========================
-   CONTENT PANELS
-========================= */
+/* CONTENT PANELS */
 
 .content-panel {
   margin-bottom: 24px;
@@ -336,9 +328,7 @@ body {
   color: #5543ad;
 }
 
-/* =========================
-   NOTES
-========================= */
+/* NOTES */
 
 .notes-grid {
   display: grid;
@@ -450,9 +440,7 @@ body {
   margin: 8px 0 0;
 }
 
-/* =========================
-   COLLECTIONS
-========================= */
+/* COLLECTIONS */
 
 .collection-list {
   display: grid;
@@ -535,9 +523,85 @@ body {
   font-size: 13px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* FORM TAMBAH CATATAN */
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.form-group label {
+  color: #302d45;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e8e6f0;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #302d45;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #8270dc;
+  box-shadow: 0 0 0 3px rgba(130, 112, 220, 0.12);
+}
+
+.form-group textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 16px;
+  border: 1px solid #e8e6f0;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #6c6682;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.secondary-button:hover {
+  background: #f7f5ff;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* RESPONSIVE */
 
 @media (max-width: 1100px) {
   .stats-grid {
@@ -611,5 +675,14 @@ body {
 
   .section-heading {
     align-items: flex-start;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions a,
+  .form-actions button {
+    width: 100%;
   }
 }
