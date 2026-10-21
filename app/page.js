@@ -178,10 +178,6 @@ export default function Home() {
             <h2>Koleksi</h2>
             <p className="muted">Kelompokkan catatan berdasarkan kategori.</p>
           </div>
-
-          <Link href="/collections" className="text-link">
-            Kelola koleksi →
-          </Link>
         </div>
 
         {collections.length === 0 && !loading && (
@@ -206,8 +202,6 @@ export default function Home() {
                   <strong>{collection.name}</strong>
                   <span>{count} catatan</span>
                 </div>
-
-                <span className="collection-arrow">→</span>
               </article>
             );
           })}
