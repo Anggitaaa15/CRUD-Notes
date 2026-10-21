@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -20,37 +19,11 @@ export default function CollectionsPage() {
         throw new Error(data.error || "Gagal mengambil koleksi");
       }
 
-      setCollections(data);
+      setCollections(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || "Terjadi kesalahan");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleDelete(id, name) {
-    const confirmed = window.confirm(
-      `Yakin ingin menghapus koleksi "${name}"? Catatan di dalamnya akan dipindahkan ke Tanpa Koleksi jika database menggunakan ON DELETE SET NULL.`
-    );
-
-    if (!confirmed) return;
-
-    try {
-      const response = await fetch(`/api/collections/${id}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Gagal menghapus koleksi");
-      }
-
-      await loadCollections();
-    } catch (err) {
-      window.alert(
-        err.message || "Terjadi kesalahan saat menghapus koleksi"
-      );
     }
   }
 
@@ -68,10 +41,6 @@ export default function CollectionsPage() {
             Kelompokkan catatan agar lebih mudah ditemukan.
           </p>
         </div>
-
-        <Link href="/collections/new" className="primary-button">
-          + Tambah Koleksi
-        </Link>
       </header>
 
       <section className="content-panel">
@@ -90,7 +59,7 @@ export default function CollectionsPage() {
           <p className="error-message">{error}</p>
         ) : collections.length === 0 ? (
           <p className="muted">
-            Belum ada koleksi. Tambahkan koleksi pertamamu.
+            Belum ada koleksi. Tambahkan koleksi melalui sidebar.
           </p>
         ) : (
           <div className="notes-grid">
@@ -109,28 +78,11 @@ export default function CollectionsPage() {
 
                 <div className="note-actions">
                   <Link
-                    href={`/collections/${collection.id}/edit`}
-                    className="secondary-button"
-                  >
-                    Edit
-                  </Link>
-
-                  <Link
                     href={`/collections/${collection.id}`}
                     className="secondary-button"
                   >
                     Lihat Catatan
                   </Link>
-
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() =>
-                      handleDelete(collection.id, collection.name)
-                    }
-                  >
-                    Hapus
-                  </button>
                 </div>
               </article>
             ))}

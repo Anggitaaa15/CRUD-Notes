@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -39,13 +38,17 @@ export default function NewCollectionPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Gagal menambahkan koleksi");
+        throw new Error(
+          data.error || "Gagal menambahkan koleksi."
+        );
       }
 
-      router.push("/collections");
+      router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan");
+      setError(
+        err.message || "Terjadi kesalahan saat menambahkan koleksi."
+      );
     } finally {
       setSaving(false);
     }
@@ -73,7 +76,9 @@ export default function NewCollectionPage() {
           </div>
         </div>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <p className="error-message">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="note-form">
           <div className="form-group">
@@ -84,7 +89,9 @@ export default function NewCollectionPage() {
               placeholder="Contoh: Pemrograman"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              maxLength={100}
               required
+              disabled={saving}
             />
           </div>
 
@@ -97,13 +104,16 @@ export default function NewCollectionPage() {
               rows={5}
               placeholder="Tuliskan deskripsi koleksi..."
               value={description}
-              onChange={(event) => setDescription(event.target.value)}
+              onChange={(event) =>
+                setDescription(event.target.value)
+              }
+              disabled={saving}
             />
           </div>
 
           <div className="form-actions">
             <Link
-              href="/collections"
+              href="/"
               className="secondary-button"
             >
               Batal
